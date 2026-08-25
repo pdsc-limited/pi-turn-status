@@ -1,0 +1,14 @@
+# Local development and build output
+build/
+node_modules/
+coverage/
+
+# Local Pi configuration and session data
+.pi/
+*.jsonl
+
+# Environment and editor state
+.env
+.env.*
+!.env.example
+.DS_Store
