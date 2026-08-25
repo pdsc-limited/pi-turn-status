@@ -162,7 +162,8 @@ describe("turn-status adapter", () => {
 		await harness.emit(turnEnd(0));
 		const renderer = harness.renderers.get(TURN_STATUS_ENTRY_TYPE);
 		if (!renderer) throw new Error("renderer was not registered");
-		const theme = { fg: (_color: string, text: string) => text } as Theme;
+		const colors: string[] = [];
+		const theme = { fg: (color: string, text: string) => { colors.push(color); return text; } } as Theme;
 		const entry = { type: "custom", customType: TURN_STATUS_ENTRY_TYPE, data: statusEntries(harness)[0] } as Parameters<typeof renderer>[0];
 		expect(renderer(entry, { expanded: false }, theme)).toBeUndefined();
 		expect(renderer({ ...entry, data: { nope: true } }, { expanded: false }, theme)).toBeUndefined();
@@ -170,8 +171,17 @@ describe("turn-status adapter", () => {
 		const collapsed = renderer(visibleEntry, { expanded: false }, theme);
 		const expanded = renderer(visibleEntry, { expanded: true }, theme);
 		expect(collapsed).toBeInstanceOf(Text);
-		expect((collapsed as Text).render(300).join("\n")).toContain("turn 1");
+		expect((collapsed as Text).render(300).join("\n")).toContain("╰─ turn 1 │");
 		expect((expanded as Text).render(300).join("\n")).toContain("cost turn");
+		expect(colors).toContain("accent");
+		expect(colors).toContain("dim");
+
+		const errorEntry = { ...visibleEntry, data: {
+			...visibleEntry.data,
+			outcome: { ...visibleEntry.data.outcome, stopReason: "error" },
+		} };
+		renderer(errorEntry, { expanded: false }, theme);
+		expect(colors).toContain("error");
 	});
 
 	it("handles show/hide/toggle/invalid and records only actual visibility changes", async () => {

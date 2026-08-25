@@ -206,15 +206,15 @@ describe("stable formatting", () => {
 	it("renders normal, error, and expanded statuses with stable line structure", () => {
 		const normal = status();
 		expect(formatStatus(normal, false)).toBe(
-			"turn 1 | 1970-01-01 00:00:01.000Z → 1970-01-01 00:00:02.500Z | 1.500s | turn in 10 out 20 cr 30 cw 40 total 100 | Σ in 10 out 20 cr 30 cw 40 total 100 | stop=stop",
+			"╰─ turn 1 │ 1970-01-01 00:00:01.000Z → 1970-01-01 00:00:02.500Z │ 1.500s │ turn in 10 out 20 cr 30 cw 40 total 100 │ Σ in 10 out 20 cr 30 cw 40 total 100 │ stop=stop",
 		);
 		const error = status({ startedAt: null, elapsedMs: null, outcome: { stopReason: "error", errorMessage: "x".repeat(161), toolErrors: [{ toolCallId: "c1", toolName: "bash" }] } });
 		const expanded = formatStatus(error, true).split("\n");
 		expect(expanded).toHaveLength(3);
-		expect(expanded[0]).toContain("turn 1 | ? → 1970-01-01 00:00:02.500Z | ?");
-		expect(expanded[0]).toContain(`error=${"x".repeat(159)}… | tool-errors=1`);
-		expect(expanded[1]).toBe("cost turn $1.00 | cumulative $1.00");
-		expect(expanded[2]).toBe("failed tools: bash (c1)");
+		expect(expanded[0]).toContain("╰─ turn 1 │ ? → 1970-01-01 00:00:02.500Z │ ?");
+		expect(expanded[0]).toContain(`error=${"x".repeat(159)}… │ tool-errors=1`);
+		expect(expanded[1]).toBe("   cost turn $1.00 │ cumulative $1.00");
+		expect(expanded[2]).toBe("   failed tools: bash (c1)");
 
 		const historical = status({ outcome: {
 			stopReason: "err\u001b[31mor",

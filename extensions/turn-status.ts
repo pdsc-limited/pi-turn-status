@@ -46,8 +46,15 @@ function notifyWarning(ctx: ExtensionContext, message: string): void {
 	if (ctx.hasUI) ctx.ui.notify(message, "warning");
 }
 
-function statusColor(theme: Theme, hasError: boolean, value: string): string {
-	return theme.fg(hasError ? "error" : "dim", value);
+function styleStatus(theme: Theme, hasError: boolean, value: string): string {
+	const [firstLine = "", ...details] = value.split("\n");
+	const separatorIndex = firstLine.indexOf(" │ ");
+	if (separatorIndex < 0) return theme.fg(hasError ? "error" : "dim", value);
+
+	const marker = firstLine.slice(0, separatorIndex);
+	const metadata = firstLine.slice(separatorIndex);
+	const styledFirstLine = theme.fg(hasError ? "error" : "accent", marker) + theme.fg("dim", metadata);
+	return [styledFirstLine, ...details.map((line) => theme.fg("dim", line))].join("\n");
 }
 
 export function registerTurnStatus(
@@ -91,7 +98,7 @@ export function registerTurnStatus(
 		if (!isTurnStatusEntryV1(entry.data) || !entry.data.visible) return undefined;
 		const hasError = entry.data.outcome.stopReason === "error" ||
 			entry.data.outcome.stopReason === "aborted" || entry.data.outcome.toolErrors.length > 0;
-		return new Text(statusColor(theme, hasError, formatStatus(entry.data, expanded)), 0, 0);
+		return new Text(styleStatus(theme, hasError, formatStatus(entry.data, expanded)), 0, 0);
 	});
 
 	pi.on("session_start", async (_event, ctx) => {

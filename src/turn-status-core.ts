@@ -300,25 +300,25 @@ export function formatStatus(entry: TurnStatusEntryV1, expanded: boolean): strin
 		? null
 		: sanitizeText(entry.outcome.errorMessage, MAX_ERROR_MESSAGE_LENGTH);
 	const lines = [
-		`turn ${entry.turnIndex + 1} | ${start} → ${end} | ${formatDuration(entry.elapsedMs)} | ` +
-		`${usageText("turn", entry.usage)} | ${usageText("Σ", entry.cumulativeUsage)} | ` +
+		`╰─ turn ${entry.turnIndex + 1} │ ${start} → ${end} │ ${formatDuration(entry.elapsedMs)} │ ` +
+		`${usageText("turn", entry.usage)} │ ${usageText("Σ", entry.cumulativeUsage)} │ ` +
 		`stop=${stopReason}`,
 	];
 	if (errorMessage) {
 		const error = errorMessage.length > 160
 			? `${errorMessage.slice(0, 159)}…`
 			: errorMessage;
-		lines[0] += ` | error=${error}`;
+		lines[0] += ` │ error=${error}`;
 	}
-	if (entry.outcome.toolErrors.length > 0) lines[0] += ` | tool-errors=${entry.outcome.toolErrors.length}`;
+	if (entry.outcome.toolErrors.length > 0) lines[0] += ` │ tool-errors=${entry.outcome.toolErrors.length}`;
 	if (expanded) {
 		lines.push(
-			`cost turn ${formatMoney(entry.usage.cost.total)} | cumulative ${formatMoney(entry.cumulativeUsage.cost.total)}`,
+			`   cost turn ${formatMoney(entry.usage.cost.total)} │ cumulative ${formatMoney(entry.cumulativeUsage.cost.total)}`,
 		);
 		if (entry.outcome.toolErrors.length > 0) {
 			const displayed = entry.outcome.toolErrors.slice(0, 10);
 			const omitted = entry.outcome.toolErrors.length - displayed.length;
-			lines.push(`failed tools: ${displayed.map((error) =>
+			lines.push(`   failed tools: ${displayed.map((error) =>
 				`${sanitizeText(error.toolName, MAX_IDENTIFIER_LENGTH)} (${sanitizeText(error.toolCallId, MAX_IDENTIFIER_LENGTH)})`).join(", ")}` +
 				(omitted > 0 ? `, … ${omitted} more` : ""));
 		}
