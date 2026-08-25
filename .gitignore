@@ -4,7 +4,12 @@ node_modules/
 coverage/
 
 # Local Pi configuration and session data
-.pi/
+.pi/*
+!.pi/extensions/
+.pi/extensions/*
+!.pi/extensions/pi-permission-system/
+.pi/extensions/pi-permission-system/*
+!.pi/extensions/pi-permission-system/config.json
 *.jsonl
 
 # Environment and editor state

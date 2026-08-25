@@ -2,7 +2,7 @@
 
 ## Purpose
 
-This repository develops a Pi coding-agent extension that records and renders a durable status line at the end of every turn. It is intended to make unattended sessions diagnosable by showing turn timestamps, elapsed time, token/cache usage, cumulative usage, and (when available) stop/error information.
+This repository develops a Pi coding-agent extension that records and renders a durable status line at the end of every turn. It is intended to make unattended sessions diagnosable by showing turn timestamps, elapsed time, token/cache usage, cumulative usage, and (when available) stop/error information. Marker data is always appended durably to the trace. Rendering is hidden by default, with a project-local setting able to make shown the default for that project. Runtime visibility controls are `/turn-status show`, `/turn-status hide`, and `/turn-status` with no argument to toggle.
 
 ## Workspace layout
 
