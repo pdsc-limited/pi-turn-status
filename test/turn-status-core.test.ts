@@ -23,7 +23,7 @@ import {
 	type ToolError,
 	type TurnStatusEntryV1,
 	type UsageTotals,
-} from "../extensions/turn-status-core.ts";
+} from "../src/turn-status-core.ts";
 
 const usage = (overrides: Partial<Omit<UsageTotals, "cost">> & { cost?: Partial<UsageTotals["cost"]> } = {}): UsageTotals => {
 	const { cost: costOverrides, ...fields } = overrides;

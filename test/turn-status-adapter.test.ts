@@ -17,7 +17,7 @@ import {
 	TURN_STATUS_ENTRY_TYPE,
 	TURN_STATUS_VISIBILITY_ENTRY_TYPE,
 	type TurnStatusEntryV1,
-} from "../extensions/turn-status-core.ts";
+} from "../src/turn-status-core.ts";
 import { registerTurnStatus, type TurnStatusDependencies } from "../extensions/turn-status.ts";
 
 type EventName = "session_start" | "session_tree" | "session_shutdown" | "turn_start" | "turn_end";

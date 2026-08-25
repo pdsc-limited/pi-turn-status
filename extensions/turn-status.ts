@@ -24,7 +24,7 @@ import {
 	visibilityFromBranch,
 	type ToolError,
 	type TurnStatusConfig,
-} from "./turn-status-core.ts";
+} from "../src/turn-status-core.ts";
 
 export interface TurnStatusDependencies {
 	now(): number;
