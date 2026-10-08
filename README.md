@@ -8,7 +8,7 @@ A **Pi turn** is the interval from Pi's `turn_start` event through its matching 
 
 ## Compatibility
 
-Supported and tested with Pi 0.85.1.
+Supported and tested with Pi 1.0.4.
 
 ## Load locally
 

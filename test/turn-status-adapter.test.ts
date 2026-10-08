@@ -75,16 +75,40 @@ const dependencies = (now = 2_500, readTextFile: TurnStatusDependencies["readTex
 	readTextFile,
 });
 
-const assistant = (usage: object, stopReason = "stop", errorMessage: string | null = null) => ({
-	role: "assistant",
-	usage,
-	stopReason,
-	errorMessage,
-});
+type AssistantTurnMessage = Extract<TurnEndEvent["message"], { role: "assistant" }>;
+type TurnToolResult = TurnEndEvent["toolResults"][number];
+
 const usage = { input: 10, output: 20, cacheRead: 3, cacheWrite: 4, totalTokens: 30, cost: { input: 1, output: 2, cacheRead: 3, cacheWrite: 4, total: 10 } };
+const assistant = (messageUsage: typeof usage, stopReason: AssistantTurnMessage["stopReason"] = "stop", errorMessage?: string): AssistantTurnMessage => ({
+	role: "assistant",
+	content: [],
+	api: "test",
+	provider: "test",
+	model: "test",
+	usage: messageUsage,
+	stopReason,
+	timestamp: 0,
+	...(errorMessage === undefined ? {} : { errorMessage }),
+});
+const toolResult = (result: Omit<TurnToolResult, "role" | "content" | "timestamp">): TurnToolResult => ({
+	role: "toolResult",
+	content: [],
+	timestamp: 0,
+	...result,
+});
 const turnStart = (turnIndex: number, timestamp: number): TurnStartEvent => ({ type: "turn_start", turnIndex, timestamp });
-const turnEnd = (turnIndex: number, message = assistant(usage), toolResults: unknown[] = []): TurnEndEvent =>
-	({ type: "turn_end", turnIndex, message, toolResults } as unknown as TurnEndEvent);
+const turnEnd = (turnIndex: number, message: AssistantTurnMessage = assistant(usage), toolResults: TurnToolResult[] = []): TurnEndEvent => ({
+	type: "turn_end",
+	turnIndex,
+	message,
+	toolResults,
+	messageEntryId: "assistant-entry",
+	toolResultEntryIds: toolResults.map((_, index) => `tool-entry-${index}`),
+	entries: [],
+	continue: false,
+	context: { contextEntries: [], contextMessages: [], llmMessages: [], pendingMessages: [], canContinue: false },
+	outcome: "completed",
+});
 const statusEntries = (harness: TurnStatusHarness): TurnStatusEntryV1[] => harness.appended
 	.filter((entry) => entry.customType === TURN_STATUS_ENTRY_TYPE)
 	.map((entry) => entry.data as TurnStatusEntryV1);
@@ -112,8 +136,8 @@ describe("turn-status adapter", () => {
 		const context = harness.context({ hasUI: false });
 		await harness.emit(turnStart(4, 1_000), context);
 		await harness.emit(turnEnd(4, assistant(usage, "error", "  provider\n failed "), [
-			{ role: "toolResult", usage: { ...usage, input: 2, totalTokens: 5 }, isError: true, toolCallId: "call-1", toolName: "lookup" },
-			{ role: "toolResult", isError: false, toolCallId: "call-2", toolName: "ok" },
+			toolResult({ usage: { ...usage, input: 2, totalTokens: 5 }, isError: true, toolCallId: "call-1", toolName: "lookup" }),
+			toolResult({ isError: false, toolCallId: "call-2", toolName: "ok" }),
 		]), context);
 
 		expect(statusEntries(harness)).toEqual([expect.objectContaining({
